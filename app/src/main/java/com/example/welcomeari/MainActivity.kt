@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -30,13 +31,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -45,7 +51,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.welcomeari.datastore.StoreUserName
 import com.example.welcomeari.ui.theme.WelcomeAriTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 class MainActivity : ComponentActivity() {
@@ -132,6 +140,10 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun ViewTwo() {
+
+
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -158,13 +170,52 @@ class MainActivity : ComponentActivity() {
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.padding(vertical = 10.dp))
+
+           val context = LocalContext.current
+
+            val scope = rememberCoroutineScope()
+
+            val dataStore = StoreUserName(context)
+
+            val savedName = dataStore.getName.collectAsState(initial = "")
+            
+            
+            var nombreValue by remember {
+               mutableStateOf("")
+           }
             OutlinedTextField(
                 modifier = Modifier.padding(horizontal = 80.dp),
-                value = "",
+                value = nombreValue,
                 label = { Text("Ingrese Nombre")},
-                onValueChange = {
+                onValueChange = { newValue ->
+                    nombreValue = newValue
 
                 })
+            Spacer(modifier = Modifier.padding(vertical = 10.dp))
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .padding(start = 14.dp, end = 14.dp),
+                onClick =  {
+
+                           scope.launch {
+                               dataStore.saveName(nombreValue)
+                           }
+
+            },
+            ){
+                Text(text = "Ingresar",
+                    color = Color.White,
+                    fontSize = 18.sp
+                )
+            }
+// LO MUESTRO ACA PERO DEBERI IR EN EL HOME
+            Text(text = savedName.value!!,
+                color = Color.Black,
+                fontSize = 18.sp
+            )
         }
     }
 
