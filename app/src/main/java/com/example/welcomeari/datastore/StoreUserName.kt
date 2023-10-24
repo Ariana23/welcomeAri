@@ -10,6 +10,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+
+// AGREGAAR INYECCION DE DEPEDENCIAS
 class StoreUserName (private val context: Context){
     companion object{
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("UserName")
@@ -20,15 +22,12 @@ class StoreUserName (private val context: Context){
             preferences ->
             preferences[USER_NAME_KEY] ?: ""
         }
-
     suspend fun saveName(name: String){
         context.dataStore.edit {
             preferences ->
             preferences[USER_NAME_KEY] = name
         }
     }
-
-
     }
 
 
